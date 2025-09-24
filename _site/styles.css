@@ -1,0 +1,482 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	background: #0d1117;
+	color: #e6edf3;
+	min-height: 100vh;
+	padding: 40px 20px;
+	line-height: 1.6;
+}
+
+.container {
+	max-width: 2400px;
+	margin: 0 auto;
+}
+
+h1 {
+	text-align: center;
+	color: #f0f6fc;
+	font-size: 2.5rem;
+	font-weight: 300;
+	margin-bottom: 3rem;
+	letter-spacing: -0.5px;
+}
+
+.setup-section {
+	padding: 2rem 0;
+	margin-bottom: 3rem;
+}
+
+.setup-section h2 {
+	margin-bottom: 1.5rem;
+	color: #f0f6fc;
+	font-weight: 400;
+	font-size: 1.5rem;
+}
+
+.input-group {
+	margin-bottom: 1.5rem;
+}
+
+label {
+	display: block;
+	margin-bottom: 0.75rem;
+	font-weight: 400;
+	color: #8b949e;
+	font-size: 0.95rem;
+}
+
+textarea {
+	width: 100%;
+	min-height: 150px;
+	padding: 1rem;
+	border: 2px solid #30363d;
+	border-radius: 8px;
+	font-family: inherit;
+	font-size: 1rem;
+	resize: vertical;
+	transition: all 0.2s ease;
+	background: rgba(22, 27, 34, 0.8);
+	color: #e6edf3;
+}
+
+textarea:focus {
+	outline: none;
+	border-color: #58a6ff;
+	box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+	background: rgba(22, 27, 34, 1);
+}
+
+.button-group {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+button {
+	padding: 0.75rem 1.5rem;
+	border: 1px solid #30363d;
+	border-radius: 4px;
+	font-size: 0.95rem;
+	font-weight: 400;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	background: #21262d;
+	color: #e6edf3;
+}
+
+.btn-primary {
+	background: #238636;
+	color: white;
+	border-color: #238636;
+}
+
+.btn-secondary {
+	background: #21262d;
+	color: #e6edf3;
+	border-color: #30363d;
+}
+
+button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.btn-primary:hover {
+	background: #2ea043;
+	border-color: #2ea043;
+}
+
+.btn-secondary:hover {
+	background: #30363d;
+	border-color: #484f58;
+}
+
+button:disabled {
+	background: #21262d;
+	color: #6e7681;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+	border-color: #21262d;
+}
+
+#controls {
+	display: none;
+}
+
+#winner-section {
+	text-align: center;
+	margin: 3rem 0;
+}
+
+.winner-announcement {
+	background: linear-gradient(135deg, #0d4f12, #238636);
+	padding: 2rem;
+	border-radius: 12px;
+	border: 2px solid #2ea043;
+	box-shadow: 0 8px 32px rgba(46, 160, 67, 0.3);
+}
+
+.winner-announcement h2 {
+	color: #f0f6fc;
+	font-size: 2rem;
+	font-weight: 400;
+	margin-bottom: 1rem;
+}
+
+.winner-name {
+	font-size: 2.5rem;
+	font-weight: 600;
+	color: #ffffff;
+	margin: 1rem 0;
+	text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.winner-announcement p {
+	color: #c9d1d9;
+	font-size: 1.1rem;
+	margin-top: 1rem;
+}
+
+#bracket-section {
+	display: none;
+	margin-top: 3rem;
+}
+
+#bracket-container {
+	position: relative;
+	padding: 4rem 2rem;
+	background: #0d1117;
+	display: flex;
+	align-items: flex-start;
+	gap: 100px;
+	min-height: fit-content;
+	height: auto;
+	overflow: visible; /* Ensure no internal scrollbars */
+	width: 100%;
+}
+
+.round {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 300px;
+	height: 100%; /* Ensure rounds take full height */
+	overflow: visible;
+	z-index: 5;
+}
+
+.round h3 {
+	text-align: center;
+	margin-bottom: 2rem;
+	padding: 0.5rem 1rem;
+	background: #21262d;
+	color: #f0f6fc;
+	border-radius: 6px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	border: 1px solid #30363d;
+	white-space: nowrap;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+	position: sticky;
+	top: 0;
+	z-index: 10;
+}
+
+.match {
+	background: #0d1117;
+	border: 1px solid #30363d;
+	border-radius: 6px;
+	padding: 1rem;
+	transition: all 0.2s ease, top 0.3s ease;
+	position: absolute;
+	width: 260px;
+	min-height: 90px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+	left: 0;
+	z-index: 10;
+}
+
+.match:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+	border-color: #484f58;
+	z-index: 15;
+}
+
+/* Dynamic connector line styles */
+.connector-horizontal, .connector-vertical, .connector-final {
+	transition: background-color 0.2s ease;
+}
+
+.connector-horizontal:hover, .connector-vertical:hover, .connector-final:hover {
+	background: #58a6ff;
+}
+
+/* Winner display styles */
+#winner-section {
+	margin: 2rem 0;
+	text-align: center;
+}
+
+.winner-announcement {
+	background: linear-gradient(135deg, #0d4f12, #238636);
+	color: #ffffff;
+	padding: 2rem 3rem;
+	border-radius: 12px;
+	margin: 2rem auto;
+	max-width: 600px;
+	box-shadow: 0 8px 32px rgba(46, 160, 67, 0.3);
+	border: 3px solid #2ea043;
+	animation: celebration 1s ease-out;
+}
+
+.winner-announcement h2 {
+	margin: 0 0 1rem 0;
+	font-size: 2rem;
+	font-weight: bold;
+}
+
+.winner-name {
+	font-size: 2.5rem;
+	font-weight: bold;
+	margin: 1rem 0;
+	text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.winner-announcement p {
+	margin: 1rem 0;
+	font-size: 1.2rem;
+}
+
+@keyframes celebration {
+	0% {
+		transform: scale(0.8) rotateX(-90deg);
+		opacity: 0;
+	}
+	50% {
+		transform: scale(1.1) rotateX(0deg);
+	}
+	100% {
+		transform: scale(1) rotateX(0deg);
+		opacity: 1;
+	}
+}
+
+/* Special positioning for different rounds */
+.round-1 {
+	z-index: 4;
+}
+
+.round-2 {
+	z-index: 3;
+}
+
+.round-3 {
+	z-index: 2;
+}
+
+.round-4 {
+	z-index: 1;
+}
+
+/* Add subtle background colors to distinguish rounds */
+.round-1 .match {
+	background: linear-gradient(135deg, #0d1117, #161b22);
+}
+
+.round-2 .match {
+	background: linear-gradient(135deg, #161b22, #1c2128);
+}
+
+.round-3 .match {
+	background: linear-gradient(135deg, #1c2128, #21262d);
+}
+
+.round-4 .match {
+	background: linear-gradient(135deg, #21262d, #30363d);
+}
+
+.team-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	width: 100%;
+}
+
+.team {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	border-radius: 3px;
+	background: #161b22;
+	border: 1px solid #30363d;
+	transition: all 0.2s ease;
+}
+
+.team.winner {
+	background: #0d4f12;
+	border-color: #238636;
+}
+
+.vs {
+	text-align: center;
+	font-weight: 400;
+	color: #8b949e;
+	padding: 0.5rem;
+	font-size: 0.9rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+.team-input {
+	flex: 1;
+	padding: 0.5rem;
+	border: 1px solid #30363d;
+	border-radius: 3px;
+	font-size: 0.95rem;
+	font-weight: 400;
+	transition: border-color 0.2s ease;
+	background: #0d1117;
+	color: #e6edf3;
+}
+
+.team-input:focus {
+	outline: none;
+	border-color: #58a6ff;
+	box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.15);
+}
+
+.team-input[readonly] {
+	background: #21262d;
+	color: #8b949e;
+	cursor: not-allowed;
+}
+
+.team-input[value="BYE"] {
+	background: #21262d;
+	color: #8b949e;
+}
+
+.vote-btn {
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	background: #238636;
+	color: white;
+	border: 1px solid #238636;
+	border-radius: 3px;
+	font-size: 0.8rem;
+	font-weight: 400;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.vote-btn:hover:not(:disabled) {
+	background: #2ea043;
+	border-color: #2ea043;
+}
+
+.vote-btn:disabled {
+	background: #6e7681;
+	border-color: #6e7681;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.undo-btn {
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	background: #da3633;
+	color: white;
+	border: 1px solid #da3633;
+	border-radius: 3px;
+	font-size: 0.8rem;
+	font-weight: 400;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	margin-left: 0.5rem;
+}
+
+.undo-btn:hover:not(:disabled) {
+	background: #f85149;
+	border-color: #f85149;
+}
+
+.undo-btn:disabled {
+	background: #6e7681;
+	border-color: #6e7681;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+@media (max-width: 768px) {
+	.container {
+		padding: 0 10px;
+	}
+	
+	h1 {
+		font-size: 2rem;
+	}
+	
+	.button-group {
+		flex-direction: column;
+	}
+	
+	button {
+		padding: 1rem;
+	}
+	
+	#bracket-container {
+		flex-direction: column;
+	}
+	
+	.round {
+		min-width: 100%;
+	}
+	
+	.team {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+}
