@@ -693,16 +693,19 @@ $(document).ready(function() {
 
 	// Handle team input changes
 	$(document).on('input', '.team-input', function() {
-		const matchDiv = $(this).closest('.match');
+		const inputElement = $(this);
+		const matchDiv = inputElement.closest('.match');
 		const matchId = parseInt(matchDiv.data('match-id'));
-		const teamNum = $(this).data('team');
-		const newValue = $(this).val().trim();
+		const newValue = inputElement.val().trim();
+		
+		// Determine which team by checking the parent container
+		const isTeam1 = inputElement.closest('.team1').length > 0;
 		
 		// Find and update the match data
 		for (let round = 1; round <= totalRounds; round++) {
 			const match = bracketData[round].find(m => m.id === matchId);
 			if (match) {
-				if (teamNum === '1') {
+				if (isTeam1) {
 					match.team1 = newValue;
 				} else {
 					match.team2 = newValue;
