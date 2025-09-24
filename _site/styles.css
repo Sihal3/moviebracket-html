@@ -128,6 +128,20 @@ button:disabled {
 
 #controls {
 	display: none;
+	gap: 1rem;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.collapse-controls {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.collapse-controls button {
+	font-size: 0.85rem;
+	padding: 0.6rem 1rem;
 }
 
 #winner-section {

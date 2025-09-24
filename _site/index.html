@@ -5,6 +5,8 @@
 		<link rel="stylesheet" href="styles.css">
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://underscorejs.org/underscore-min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 		<script src="script.js"></script>
 	</head>
 	<body>
@@ -23,6 +25,11 @@
 					<button id="generate-bracket" class="btn-primary">Generate Bracket</button>
 					<div id="controls">
 						<button id="shuffle-bracket" class="btn-secondary">Shuffle Movies</button>
+						<div class="collapse-controls">
+							<button id="collapse-round" class="btn-secondary">Collapse Leftmost Round</button>
+							<button id="restore-round" class="btn-secondary" disabled>Restore Leftmost Round</button>
+						</div>
+						<button id="export-pdf" class="btn-secondary">Export PDF</button>
 					</div>
 				</div>
 			</div>

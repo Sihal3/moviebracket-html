@@ -3,6 +3,7 @@ $(document).ready(function() {
 		let bracketData = [];
 		let totalRounds = 0;
 		let currentRound = 1;
+		let collapsedRounds = 0; // Track collapsed rounds separately
 		
 		// Function to update movie count display
 		function updateMovieCount() {
@@ -144,6 +145,12 @@ $(document).ready(function() {
 		});
 
 		for (let round = 1; round <= totalRounds; round++) {
+			// Skip collapsed rounds entirely - remove their divs
+			if (round <= collapsedRounds) {
+				container.find(`.round-${round}`).remove();
+				continue;
+			}
+			
 			let roundDiv = container.find(`.round-${round}`);
 			
 			// Create round if it doesn't exist
@@ -151,13 +158,27 @@ $(document).ready(function() {
 				roundDiv = $(`<div class="round round-${round}" data-round="${round}"></div>`);
 				const roundTitle = $(`<h3>Round ${round}${round === totalRounds ? ' - FINAL' : ''}</h3>`);
 				roundDiv.append(roundTitle);
-				container.append(roundDiv);
+				
+				// Insert rounds in the correct order (leftmost first)
+				let inserted = false;
+				container.find('.round').each(function() {
+					const existingRound = parseInt($(this).data('round'));
+					if (existingRound > round) {
+						roundDiv.insertBefore($(this));
+						inserted = true;
+						return false; // Break the loop
+					}
+				});
+				
+				if (!inserted) {
+					container.append(roundDiv);
+				}
 			}
 
 			const matchesInRound = bracketData[round].length;
 			
 			// Calculate positions mathematically - no dynamic repositioning
-			const spacingMultiplier = Math.pow(2, round - 1);
+			const spacingMultiplier = Math.pow(2, (round - collapsedRounds) - 1); // Adjust for collapsed rounds
 			const matchSpacing = finalSpacing * spacingMultiplier;
 			
 			// Calculate start offset for proper centering
@@ -277,10 +298,15 @@ $(document).ready(function() {
 		const finalSpacing = actualMatchHeight + 13; // Same as renderBracket
 
 		for (let round = 1; round < totalRounds; round++) {
+			// Skip collapsed rounds
+			if (round < collapsedRounds) {
+				continue;
+			}
+			
 			const currentRoundMatches = bracketData[round].length;
 			
 			// Calculate spacing for current round: same as renderBracket
-			const spacingMultiplier = Math.pow(2, round - 1);
+			const spacingMultiplier = Math.pow(2, (round - collapsedRounds) - 1); // Adjust for collapsed rounds
 			const matchSpacing = finalSpacing * spacingMultiplier;
 			
 			// Calculate start offset: same as renderBracket
@@ -289,7 +315,7 @@ $(document).ready(function() {
 			for (let matchIndex = 0; matchIndex < currentRoundMatches; matchIndex++) {
 				const matchTopPosition = startOffset + (matchIndex * matchSpacing);
 				const matchCenterY = matchTopPosition + 93.5; // Center of 187px tall match (including padding)
-				const matchRightX = (round - 1) * (300 + 100) + 260 + 32; // (round-1) * (300px round width + 100px gap) + 260px match width
+				const matchRightX = (round - 1 - collapsedRounds) * (300 + 100) + 260 + 32; // Adjust for collapsed rounds
 
 				// Horizontal line from match to connector junction
 				const horizontalConnector = $(`
@@ -594,9 +620,10 @@ $(document).ready(function() {
 			// Add static connector lines after bracket is rendered
 			setTimeout(() => {
 				addStaticConnectorLines();
+				updateCollapseButtonState(); // Update button states
 			}, 50);
 			
-			$('#controls').show();
+			$('#controls').show().css('display', 'flex');
 			$('#bracket-section').show();
 		}, 10);
 	});
@@ -613,6 +640,9 @@ $(document).ready(function() {
 			const shuffledMovies = shuffle(currentBracket);
 			bracketData = createBracketStructure(shuffledMovies);
 			
+			// Reset collapsed rounds on shuffle
+			collapsedRounds = 0;
+			
 			// Handle BYEs immediately after bracket creation
 			handleByes();
 			
@@ -622,6 +652,7 @@ $(document).ready(function() {
 			// Add static connector lines after bracket is rendered
 			setTimeout(() => {
 				addStaticConnectorLines();
+				updateCollapseButtonState(); // Update button states
 			}, 50);
 		}, 10);
 	});
@@ -744,6 +775,7 @@ $(document).ready(function() {
 		currentBracket = [];
 		bracketData = [];
 		totalRounds = 0;
+		collapsedRounds = 0; // Reset collapsed rounds
 		isProcessingBracket = false; // Reset processing flag
 		$('#bracket-container').empty();
 		$('#controls').hide();
@@ -751,4 +783,155 @@ $(document).ready(function() {
 		$('#movie-list').val('');
 		updateMovieCount(); // Update count display
 	});
+	
+	// Function to collapse the leftmost round
+	function collapseLeftmostRound() {
+		if (collapsedRounds >= totalRounds - 1) {
+			return; // Button should be disabled, but just in case
+		}
+		
+		const roundToCollapse = collapsedRounds + 1;
+		
+		// Check if the round to collapse has any matches with winners
+		const hasCompletedMatches = bracketData[roundToCollapse].some(match => match.winner);
+		
+		if (!hasCompletedMatches) {
+			alert(`Please complete some matches in round ${roundToCollapse} before collapsing it.`);
+			return;
+		}
+		
+		collapsedRounds++;
+		
+		// Re-render the bracket (div will be automatically removed)
+		renderBracket(true);
+		
+		// Re-add connector lines
+		setTimeout(() => {
+			addStaticConnectorLines();
+		}, 50);
+		
+		// Update button states
+		updateCollapseButtonState();
+	}
+	
+	// Function to restore the leftmost collapsed round
+	function restoreLeftmostRound() {
+		if (collapsedRounds <= 0) {
+			return; // Button should be disabled, but just in case
+		}
+		
+		collapsedRounds--;
+		
+		// Re-render the bracket (div will be automatically added back)
+		renderBracket(true);
+		
+		// Re-add connector lines
+		setTimeout(() => {
+			addStaticConnectorLines();
+		}, 50);
+		
+		// Update button states
+		updateCollapseButtonState();
+	}
+	
+	// Function to update collapse button states
+	function updateCollapseButtonState() {
+		const collapseBtn = $('#collapse-round');
+		const restoreBtn = $('#restore-round');
+		
+		// Update collapse button
+		if (collapsedRounds >= totalRounds - 1) {
+			collapseBtn.prop('disabled', true).text('No More Rounds');
+		} else {
+			collapseBtn.prop('disabled', false).text('Collapse Leftmost Round');
+		}
+		
+		// Update restore button
+		if (collapsedRounds <= 0) {
+			restoreBtn.prop('disabled', true);
+		} else {
+			restoreBtn.prop('disabled', false);
+		}
+	}
+	
+	// Handle collapse round button
+	$(document).on('click', '#collapse-round', function() {
+		collapseLeftmostRound();
+	});
+	
+	// Handle restore round button
+	$(document).on('click', '#restore-round', function() {
+		restoreLeftmostRound();
+	});
+	
+	// Handle PDF export button
+	$(document).on('click', '#export-pdf', function() {
+		exportToPDF();
+	});
+	
+	// Function to export bracket as PDF
+	async function exportToPDF() {
+		// Check if required libraries are loaded
+		if (typeof html2canvas === 'undefined') {
+			alert('html2canvas library not loaded. Please refresh the page and try again.');
+			return;
+		}
+		
+		// Check for jsPDF in different possible locations
+		const jsPDFLib = window.jsPDF || window.jspdf?.jsPDF || (typeof jsPDF !== 'undefined' ? jsPDF : null);
+		if (!jsPDFLib) {
+			alert('jsPDF library not loaded. Please refresh the page and try again.');
+			return;
+		}
+		
+		const bracketContainer = document.getElementById('bracket-container');
+		if (!bracketContainer) {
+			alert('No bracket to export!');
+			return;
+		}
+		
+		try {
+			// Hide any hover effects and ensure clean state
+			bracketContainer.style.pointerEvents = 'none';
+			
+			// Capture the bracket as canvas
+			const canvas = await html2canvas(bracketContainer, {
+				backgroundColor: '#0d1117',
+				scale: 2, // Higher resolution
+				useCORS: true,
+				allowTaint: true
+			});
+			
+			// Create PDF
+			const imgData = canvas.toDataURL('image/png');
+			const pdf = new jsPDFLib({
+				orientation: 'landscape',
+				unit: 'mm',
+				format: 'a4'
+			});
+			
+			// Calculate dimensions to fit the page
+			const pdfWidth = pdf.internal.pageSize.getWidth();
+			const pdfHeight = pdf.internal.pageSize.getHeight();
+			const imgWidth = canvas.width;
+			const imgHeight = canvas.height;
+			const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+			
+			const finalWidth = imgWidth * ratio;
+			const finalHeight = imgHeight * ratio;
+			const x = (pdfWidth - finalWidth) / 2;
+			const y = (pdfHeight - finalHeight) / 2;
+			
+			pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+			pdf.save('movie-bracket.pdf');
+			
+			// Restore interactivity
+			bracketContainer.style.pointerEvents = '';
+			
+		} catch (error) {
+			console.error('PDF export failed:', error);
+			alert('Failed to export PDF. Please try again.');
+			bracketContainer.style.pointerEvents = '';
+		}
+	}
 });
