@@ -49,10 +49,39 @@ $(document).ready(function() {
 		const rounds = Math.log2(bracketSize);
 		totalRounds = rounds;
 		
-		// Pad with byes if needed
-		const paddedMovies = [...movies];
-		while (paddedMovies.length < bracketSize) {
-			paddedMovies.push('BYE');
+		const numByes = bracketSize - movies.length;
+		
+		if (numByes === 0) {
+			// No BYEs needed
+			var paddedMovies = [...movies];
+		} else {
+			// Hardcoded BYE positions for standard tournament seeding
+			const byePositionsMap = {
+				4: [4, 2],
+				8: [8, 4, 7, 3],
+				16: [16, 8, 15, 7, 12, 4, 11, 3],
+				32: [32, 16, 31, 15, 24, 8, 23, 7, 28, 12, 27, 11, 20, 4, 19, 3],
+				64: [64, 32, 63, 31, 48, 16, 47, 15, 56, 24, 55, 23, 40, 8, 39, 7, 
+					 44, 28, 43, 27, 36, 12, 35, 11, 52, 20, 51, 19, 60, 4, 59, 3]
+			};
+			
+			const byePositions = byePositionsMap[bracketSize] || [];
+			const actualByePositions = byePositions.slice(0, numByes);
+			
+			// Create array with movies and BYEs in correct positions
+			const result = Array(bracketSize);
+			let movieIndex = 0;
+			
+			for (let pos = 1; pos <= bracketSize; pos++) {
+				if (actualByePositions.includes(pos)) {
+					result[pos - 1] = 'BYE';
+				} else {
+					result[pos - 1] = movies[movieIndex];
+					movieIndex++;
+				}
+			}
+			
+			var paddedMovies = result;
 		}
 
 		// Create bracket structure
@@ -64,7 +93,7 @@ $(document).ready(function() {
 			bracket[round] = [];
 			for (let match = 0; match < currentRoundMatches; match++) {
 				if (round === 1) {
-					// First round - populate with actual movies
+					// First round - populate with properly arranged teams
 					bracket[round].push({
 						id: matchId++,
 						round: round,
